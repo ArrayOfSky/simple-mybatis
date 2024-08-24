@@ -8,6 +8,9 @@ class ArrayofskyMybatisSimpleApplicationTests {
 
     @Test
     void contextLoads() {
+
+
+
     }
 
 }
