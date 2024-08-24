@@ -1,6 +1,10 @@
 package com.arrayofsky.arrayofskymybatissimple;
 
 import com.arrayofsky.arrayofskymybatissimple.mapper.MapperProxyFactory;
+import com.arrayofsky.arrayofskymybatissimple.mapper.MapperRegistry;
+import com.arrayofsky.arrayofskymybatissimple.session.SqlSession;
+import com.arrayofsky.arrayofskymybatissimple.session.SqlSessionFactory;
+import com.arrayofsky.arrayofskymybatissimple.session.defaults.DefaultSqlSessionFactory;
 import com.arrayofsky.arrayofskymybatissimple.test.UserDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,22 +22,23 @@ public class ArrayofskyMybatisSimpleApplication {
 
     public static void main(String[] args) {
 
-        MapperProxyFactory<UserDao> factory = new MapperProxyFactory<>(UserDao.class);
+        // 1. 注册 Mapper
+        MapperRegistry registry = new MapperRegistry();
+        registry.addMappers("com.arrayofsky.arrayofskymybatissimple.test");
 
+        // 2. 从 SqlSession 工厂获取 Session
+        SqlSessionFactory sqlSessionFactory = new DefaultSqlSessionFactory(registry);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
 
-        //初始化sqlsession，具体接口方法和sql语句的映射关系
-        Map<String, String> sqlSession = new HashMap<>();
-        sqlSession.put("com.arrayofsky.arrayofskymybatissimple.test.UserDao.queryUserName", "模拟执行 Mapper.xml 中 SQL 语句的操作：查询用户姓名");
-        sqlSession.put("com.arrayofsky.arrayofskymybatissimple.test.UserDao.queryUserAge", "模拟执行 Mapper.xml 中 SQL 语句的操作：查询用户年龄");
-        UserDao userDao = factory.newInstance(sqlSession);
+        // 3. 获取映射器对象
+        UserDao userDao = sqlSession.getMapper(UserDao.class);
 
-        //执行测试
+        // 4. 测试验证
         String res = userDao.queryUserName("10001");
         logger.info("测试结果：{}", res);
 
-        //测试对于Object方法的放行
-        userDao.hashCode();
-
     }
+
+
 
 }
