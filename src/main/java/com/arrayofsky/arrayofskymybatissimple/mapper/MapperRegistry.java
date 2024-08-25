@@ -1,6 +1,7 @@
 package com.arrayofsky.arrayofskymybatissimple.mapper;
 
 import cn.hutool.core.lang.ClassScanner;
+import com.arrayofsky.arrayofskymybatissimple.session.Configuration;
 import com.arrayofsky.arrayofskymybatissimple.session.SqlSession;
 
 import java.util.HashMap;
@@ -11,6 +12,12 @@ import java.util.Set;
  *  映射器注册机
  */
 public class MapperRegistry {
+
+    private Configuration config;
+
+    public MapperRegistry(Configuration config) {
+        this.config = config;
+    }
 
     /**
      * 将已添加的映射器代理加入到 HashMap
