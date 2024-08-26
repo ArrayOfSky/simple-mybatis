@@ -1,6 +1,8 @@
 package com.arrayofsky.arrayofskymybatissimple.session;
 
 import com.arrayofsky.arrayofskymybatissimple.datasource.druid.DruidDataSourceFactory;
+import com.arrayofsky.arrayofskymybatissimple.datasource.pooled.PooledDataSourceFactory;
+import com.arrayofsky.arrayofskymybatissimple.datasource.unpooled.UnpooledDataSourceFactory;
 import com.arrayofsky.arrayofskymybatissimple.mapper.MapperRegistry;
 import com.arrayofsky.arrayofskymybatissimple.mapping.Environment;
 import com.arrayofsky.arrayofskymybatissimple.mapping.MappedStatement;
@@ -35,6 +37,8 @@ public class Configuration {
     public Configuration() {
         typeAliasRegistry.registerAlias("JDBC", JdbcTransactionFactory.class);
         typeAliasRegistry.registerAlias("DRUID", DruidDataSourceFactory.class);
+        typeAliasRegistry.registerAlias("UNPOOLED", UnpooledDataSourceFactory.class);
+        typeAliasRegistry.registerAlias("POOLED", PooledDataSourceFactory.class);
     }
 
     public void addMappers(String packageName) {
