@@ -3,7 +3,7 @@
 <mapper namespace="com.arrayofsky.arrayofskymybatissimple.test.UserDao">
 
     <select id="queryUserInfoById" parameterType="java.lang.Long" resultType="com.arrayofsky.arrayofskymybatissimple.test.User">
-        SELECT id, userId, userHead, createTime
+        SELECT id, userId, userHead, userName
         FROM user
         where id = #{id}
     </select>
