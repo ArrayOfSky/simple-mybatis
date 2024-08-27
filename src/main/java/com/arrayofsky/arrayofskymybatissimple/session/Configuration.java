@@ -3,9 +3,17 @@ package com.arrayofsky.arrayofskymybatissimple.session;
 import com.arrayofsky.arrayofskymybatissimple.datasource.druid.DruidDataSourceFactory;
 import com.arrayofsky.arrayofskymybatissimple.datasource.pooled.PooledDataSourceFactory;
 import com.arrayofsky.arrayofskymybatissimple.datasource.unpooled.UnpooledDataSourceFactory;
+import com.arrayofsky.arrayofskymybatissimple.executor.Executor;
+import com.arrayofsky.arrayofskymybatissimple.executor.SimpleExecutor;
+import com.arrayofsky.arrayofskymybatissimple.executor.resultset.DefaultResultSetHandler;
+import com.arrayofsky.arrayofskymybatissimple.executor.resultset.ResultSetHandler;
+import com.arrayofsky.arrayofskymybatissimple.executor.statement.PreparedStatementHandler;
+import com.arrayofsky.arrayofskymybatissimple.executor.statement.StatementHandler;
 import com.arrayofsky.arrayofskymybatissimple.mapper.MapperRegistry;
+import com.arrayofsky.arrayofskymybatissimple.mapping.BoundSql;
 import com.arrayofsky.arrayofskymybatissimple.mapping.Environment;
 import com.arrayofsky.arrayofskymybatissimple.mapping.MappedStatement;
+import com.arrayofsky.arrayofskymybatissimple.transaction.Transaction;
 import com.arrayofsky.arrayofskymybatissimple.transaction.jdbc.JdbcTransactionFactory;
 import com.arrayofsky.arrayofskymybatissimple.type.TypeAliasRegistry;
 
@@ -76,5 +84,29 @@ public class Configuration {
     public void setEnvironment(Environment environment) {
         this.environment = environment;
     }
+
+
+    /**
+     * 创建结果集处理器
+     */
+    public ResultSetHandler newResultSetHandler(Executor executor, MappedStatement mappedStatement, BoundSql boundSql) {
+        return new DefaultResultSetHandler(executor, mappedStatement, boundSql);
+    }
+
+    /**
+     * 生产执行器
+     */
+    public Executor newExecutor(Transaction transaction) {
+        return new SimpleExecutor(this, transaction);
+    }
+
+    /**
+     * 创建语句处理器
+     */
+    public StatementHandler newStatementHandler(Executor executor, MappedStatement mappedStatement, Object parameter, ResultHandler resultHandler, BoundSql boundSql) {
+        return new PreparedStatementHandler(executor, mappedStatement, parameter, resultHandler, boundSql);
+    }
+
+
 
 }
