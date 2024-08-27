@@ -20,7 +20,9 @@ public class PoolState {
     // 总请求时间
     protected long accumulatedRequestTime = 0;
     protected long accumulatedCheckoutTime = 0;
+    // 超期被占用时间
     protected long claimedOverdueConnectionCount = 0;
+
     protected long accumulatedCheckoutTimeOfOverdueConnections = 0;
 
     // 总等待时间
