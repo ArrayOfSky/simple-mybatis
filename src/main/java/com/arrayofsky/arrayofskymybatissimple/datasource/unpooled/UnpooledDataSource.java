@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 /**
- * @description 无池化数据源实现 每次获取connect都会创建新的connect
+ * @description 无池化数据源实现
  */
 public class UnpooledDataSource implements DataSource {
 
@@ -21,7 +21,6 @@ public class UnpooledDataSource implements DataSource {
     private static Map<String, Driver> registeredDrivers = new ConcurrentHashMap<>();
     // 驱动
     private String driver;
-
     // DB 链接地址
     private String url;
     // 账号
@@ -33,9 +32,7 @@ public class UnpooledDataSource implements DataSource {
     // 事务级别
     private Integer defaultTransactionIsolationLevel;
 
-    // 将当前已注册的驱动放入驱动注册器中
     static {
-        //获得当前已注册的JDBC驱动
         Enumeration<Driver> drivers = DriverManager.getDrivers();
         while (drivers.hasMoreElements()) {
             Driver driver = drivers.nextElement();
@@ -43,9 +40,18 @@ public class UnpooledDataSource implements DataSource {
         }
     }
 
+    public UnpooledDataSource() {
+    }
+
+    public UnpooledDataSource(String driver, String url, String username, String password) {
+        this.driver = driver;
+        this.url = url;
+        this.username = username;
+        this.password = password;
+    }
+
     /**
-     * 驱动代理 暂时我也没搞懂为什么要用代理包一层
-     * 实际上暂时也没有做额外的处理
+     * 驱动代理
      */
     private static class DriverProxy implements Driver {
 
@@ -92,16 +98,14 @@ public class UnpooledDataSource implements DataSource {
     }
 
     /**
-     * 注册驱动
+     * 初始化驱动
      */
     private synchronized void initializerDriver() throws SQLException {
-        //如果当前环境未注册该驱动 则尝试进行手动注册
         if (!registeredDrivers.containsKey(driver)) {
             try {
-                //根据类的权限定名，通过反射注册该 驱动
                 Class<?> driverType = Class.forName(driver, true, driverClassLoader);
+                // https://www.kfu.com/~nsayer/Java/dyn-jdbc.html
                 Driver driverInstance = (Driver) driverType.newInstance();
-                // 这里创造的是代理对象
                 DriverManager.registerDriver(new DriverProxy(driverInstance));
                 registeredDrivers.put(driver, driverInstance);
             } catch (Exception e) {
@@ -125,9 +129,7 @@ public class UnpooledDataSource implements DataSource {
     }
 
     private Connection doGetConnection(Properties properties) throws SQLException {
-        //保证需要执行的驱动是注册过的
         initializerDriver();
-        //获取连接并注入配置的属性
         Connection connection = DriverManager.getConnection(url, properties);
         if (autoCommit != null && autoCommit != connection.getAutoCommit()) {
             connection.setAutoCommit(autoCommit);
@@ -254,5 +256,4 @@ public class UnpooledDataSource implements DataSource {
     public void setDefaultTransactionIsolationLevel(Integer defaultTransactionIsolationLevel) {
         this.defaultTransactionIsolationLevel = defaultTransactionIsolationLevel;
     }
-
 }

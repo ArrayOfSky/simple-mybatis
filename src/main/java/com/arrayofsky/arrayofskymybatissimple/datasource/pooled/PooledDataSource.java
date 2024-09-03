@@ -2,7 +2,6 @@ package com.arrayofsky.arrayofskymybatissimple.datasource.pooled;
 
 import com.arrayofsky.arrayofskymybatissimple.datasource.unpooled.UnpooledDataSource;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.io.PrintWriter;
