@@ -15,6 +15,7 @@ public class GetFieldInvoker implements Invoker {
 
     @Override
     public Object invoke(Object target, Object[] args) throws Exception {
+        // 调用java反射的get
         return field.get(target);
     }
 

@@ -23,6 +23,7 @@ public class UnpooledDataSourceFactory implements DataSourceFactory {
         MetaObject metaObject = SystemMetaObject.forObject(dataSource);
         for (Object key : props.keySet()) {
             String propertyName = (String) key;
+            //如果有配置文件的这个属性 解析的到 那就设置
             if (metaObject.hasSetter(propertyName)) {
                 String value = (String) props.get(propertyName);
                 Object convertedValue = convertValue(metaObject, propertyName, value);

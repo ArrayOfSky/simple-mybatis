@@ -13,7 +13,7 @@ public class MethodInvoker implements Invoker {
     public MethodInvoker(Method method) {
         this.method = method;
 
-        // 如果只有一个参数，返回参数类型，否则返回 return 类型
+        // 如果只有一个参数，返回参数类型，否则返回 return 类型 暂时这么约定俗成
         if (method.getParameterTypes().length == 1) {
             type = method.getParameterTypes()[0];
         } else {
@@ -23,6 +23,7 @@ public class MethodInvoker implements Invoker {
 
     @Override
     public Object invoke(Object target, Object[] args) throws Exception {
+        // 调用实际method方法的执行
         return method.invoke(target, args);
     }
 

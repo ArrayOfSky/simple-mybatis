@@ -13,7 +13,9 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 
 /**
- * @description 元类
+ * @description 元类 对reflector的包装
+ * 在元类 MetaClass 提供必要的创建反射器
+ * 以及使用反射器获取 get/set 的 Invoker 反射方法。
  */
 public class MetaClass {
 

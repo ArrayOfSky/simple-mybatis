@@ -18,7 +18,9 @@ import com.arrayofsky.arrayofskymybatissimple.transaction.jdbc.JdbcTransactionFa
 import com.arrayofsky.arrayofskymybatissimple.type.TypeAliasRegistry;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @description 配置项
@@ -41,6 +43,10 @@ public class Configuration {
 
     // 类型别名注册机
     protected final TypeAliasRegistry typeAliasRegistry = new TypeAliasRegistry();
+
+
+    // 已加载的资源
+    protected final Set<String> loadedResources = new HashSet<>();
 
     public Configuration() {
         typeAliasRegistry.registerAlias("JDBC", JdbcTransactionFactory.class);
@@ -107,6 +113,12 @@ public class Configuration {
         return new PreparedStatementHandler(executor, mappedStatement, parameter, resultHandler, boundSql);
     }
 
+    public boolean isResourceLoaded(String resource) {
+        return loadedResources.contains(resource);
+    }
 
+    public void addLoadedResource(String resource) {
+        loadedResources.add(resource);
+    }
 
 }

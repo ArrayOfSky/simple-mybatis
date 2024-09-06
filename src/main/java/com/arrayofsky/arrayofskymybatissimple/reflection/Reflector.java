@@ -1,6 +1,5 @@
 package com.arrayofsky.arrayofskymybatissimple.reflection;
 
-
 import com.arrayofsky.arrayofskymybatissimple.reflection.invoker.GetFieldInvoker;
 import com.arrayofsky.arrayofskymybatissimple.reflection.invoker.Invoker;
 import com.arrayofsky.arrayofskymybatissimple.reflection.invoker.MethodInvoker;
@@ -13,6 +12,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @description 反射器，属性 get/set 的映射器
+ * Reflector 反射器专门用于解耦对象信息的，
+ * 只有把一个对象信息所含带的属性、方法以及关联的类都以此解析出来，才能满足后续对属性值的设置和获取。
+ *
  */
 public class Reflector {
 
@@ -50,6 +52,7 @@ public class Reflector {
         addSetMethods(clazz);
         // 加入字段
         addFields(clazz);
+
         readablePropertyNames = getMethods.keySet().toArray(new String[getMethods.keySet().size()]);
         writeablePropertyNames = setMethods.keySet().toArray(new String[setMethods.keySet().size()]);
         for (String propName : readablePropertyNames) {
@@ -60,10 +63,17 @@ public class Reflector {
         }
     }
 
+
+    /**
+     * 解析默认构造器
+     * @param clazz
+     */
     private void addDefaultConstructor(Class<?> clazz) {
         Constructor<?>[] consts = clazz.getDeclaredConstructors();
         for (Constructor<?> constructor : consts) {
+            // 空参构造器
             if (constructor.getParameterTypes().length == 0) {
+                //为了保证反射顺利执行 让默认构造器可以访问
                 if (canAccessPrivateMethods()) {
                     try {
                         constructor.setAccessible(true);
@@ -78,23 +88,31 @@ public class Reflector {
         }
     }
 
+
+
     private void addGetMethods(Class<?> clazz) {
         Map<String, List<Method>> conflictingGetters = new HashMap<>();
+
         Method[] methods = getClassMethods(clazz);
         for (Method method : methods) {
             String name = method.getName();
             if (name.startsWith("get") && name.length() > 3) {
+                // 参数限制
                 if (method.getParameterTypes().length == 0) {
+                    // 字符串的切割
                     name = PropertyNamer.methodToProperty(name);
                     addMethodConflict(conflictingGetters, name, method);
                 }
+
             } else if (name.startsWith("is") && name.length() > 2) {
+
                 if (method.getParameterTypes().length == 0) {
                     name = PropertyNamer.methodToProperty(name);
                     addMethodConflict(conflictingGetters, name, method);
                 }
             }
         }
+
         resolveGetterConflicts(conflictingGetters);
     }
 
@@ -104,6 +122,7 @@ public class Reflector {
         for (Method method : methods) {
             String name = method.getName();
             if (name.startsWith("set") && name.length() > 3) {
+                //set一定要有参数
                 if (method.getParameterTypes().length == 1) {
                     name = PropertyNamer.methodToProperty(name);
                     addMethodConflict(conflictingSetters, name, method);
@@ -114,6 +133,7 @@ public class Reflector {
     }
 
     private void resolveSetterConflicts(Map<String, List<Method>> conflictingSetters) {
+
         for (String propName : conflictingSetters.keySet()) {
             List<Method> setters = conflictingSetters.get(propName);
             Method firstMethod = setters.get(0);
@@ -156,6 +176,7 @@ public class Reflector {
 
     private void addFields(Class<?> clazz) {
         Field[] fields = clazz.getDeclaredFields();
+
         for (Field field : fields) {
             if (canAccessPrivateMethods()) {
                 try {
@@ -165,6 +186,7 @@ public class Reflector {
                 }
             }
             if (field.isAccessible()) {
+                //如果这个field没有set方法
                 if (!setMethods.containsKey(field.getName())) {
                     // issue #379 - removed the check for final because JDK 1.5 allows
                     // modification of final fields through reflection (JSR-133). (JGB)
@@ -232,6 +254,7 @@ public class Reflector {
     }
 
     private void addGetMethod(String name, Method method) {
+        //检查这个 代表field 的 name 是不是 解析正确了
         if (isValidPropertyName(name)) {
             getMethods.put(name, new MethodInvoker(method));
             getTypes.put(name, method.getReturnType());
@@ -243,7 +266,9 @@ public class Reflector {
     }
 
     private void addMethodConflict(Map<String, List<Method>> conflictingMethods, String name, Method method) {
+        // 如果不存在则添加 如果存在则返回里面存在的
         List<Method> list = conflictingMethods.computeIfAbsent(name, k -> new ArrayList<>());
+        // name其实是属性名
         list.add(method);
     }
 
@@ -310,6 +335,7 @@ public class Reflector {
         return sb.toString();
     }
 
+    // 保证 能通过反射机制访问到私有属性
     private static boolean canAccessPrivateMethods() {
         try {
             SecurityManager securityManager = System.getSecurityManager();
