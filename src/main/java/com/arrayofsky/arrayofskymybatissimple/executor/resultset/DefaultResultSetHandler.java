@@ -16,27 +16,19 @@ public class DefaultResultSetHandler implements ResultSetHandler {
 
     private final BoundSql boundSql;
 
+    private final MappedStatement mappedStatement;
+
     public DefaultResultSetHandler(Executor executor, MappedStatement mappedStatement, BoundSql boundSql) {
         this.boundSql = boundSql;
+        this.mappedStatement = mappedStatement;
     }
 
-    /**
-     * 处理结果集
-     * @param stmt sql定义的结果
-     * @return
-     * @param <E>
-     * @throws SQLException
-     */
     @Override
     public <E> List<E> handleResultSets(Statement stmt) throws SQLException {
         ResultSet resultSet = stmt.getResultSet();
-        try {
-            return resultSet2Obj(resultSet, Class.forName(boundSql.getResultType()));
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return resultSet2Obj(resultSet, mappedStatement.getResultType());
     }
+
 
     private <T> List<T> resultSet2Obj(ResultSet resultSet, Class<?> clazz) {
         List<T> list = new ArrayList<>();

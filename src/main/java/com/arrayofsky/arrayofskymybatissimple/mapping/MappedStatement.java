@@ -14,7 +14,13 @@ public class MappedStatement {
     private String id;
     private SqlCommandType sqlCommandType;
 
-    private BoundSql boundSql;
+    private SqlSource sqlSource;
+
+    public SqlSource getSqlSource() {
+        return sqlSource;
+    }
+
+    Class<?> resultType;
 
     MappedStatement() {
         // constructor disabled
@@ -27,12 +33,14 @@ public class MappedStatement {
 
         private MappedStatement mappedStatement = new MappedStatement();
 
-        public Builder(Configuration configuration, String id, SqlCommandType sqlCommandType, BoundSql boundSql) {
+        public Builder(Configuration configuration, String id, SqlCommandType sqlCommandType, SqlSource sqlSource, Class<?> resultType) {
             mappedStatement.configuration = configuration;
             mappedStatement.id = id;
             mappedStatement.sqlCommandType = sqlCommandType;
-            mappedStatement.boundSql = boundSql;
+            mappedStatement.sqlSource = sqlSource;
+            mappedStatement.resultType = resultType;
         }
+
 
         public MappedStatement build() {
             assert mappedStatement.configuration != null;
@@ -54,8 +62,7 @@ public class MappedStatement {
         return sqlCommandType;
     }
 
-    public BoundSql getBoundSql() {
-        return boundSql;
+    public Class<?> getResultType() {
+        return resultType;
     }
-
 }
